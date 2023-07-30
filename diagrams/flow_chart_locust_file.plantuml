@@ -1,0 +1,36 @@
+@startuml
+
+start
+
+:Initialize Locust Environment;
+note right: Set up command-line parser\nand listeners for events.
+
+:Load Events Data;
+note right: Load data for events to be uploaded\nto S3 into a queue.
+
+while (Queue Not Empty) is (true)
+  :Get Next Event from Queue;
+  if (Event not Uploaded Before) then (yes)
+    :Upload File to S3;
+    note right: Upload the file associated with\nthe event to S3.
+
+    :Record Upload Stats;
+    note right: Calculate and record upload speed\nand other statistics.
+
+    :Add File to Uploaded Set;
+    note right: Mark the file as uploaded to avoid\nduplicate uploads.
+  else (no)
+    :Skip Event;
+    note right: The event's file has been uploaded\nbefore, skip the upload.
+  endif
+endwhile (false)
+
+:Write Average Upload Speed to CSV;
+note right: Calculate the average upload speed\nand write it to the statistics file.
+
+:Locust Execution Completed;
+note right: The Locust test execution is completed.
+
+stop
+
+@enduml

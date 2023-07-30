@@ -1,0 +1,55 @@
+@startuml
+
+note as Note
+<b>S3LoaderClient</b>: Represents the client class responsible for executing S3 uploads.
+<b>S3LoaderTaskSet</b>: Represents the task set class used by the
+<b>S3LoaderLocust</b> class to define the tasks performed during the load test.
+<b>S3LoaderLocust</b>: Represents the main Locust user class that is used to simulate the users and execute the S3 upload tasks.
+<b>CustomCSVStatsWriter</b>: Represents the custom statistics writer class used to add additional statistics to the CSV file.
+<b>Events</b>: Represents the event class responsible for handling request success, request failure, and quitting events during the load test.
+<b>LocalRunner</b>: Represents the local runner class used for running Locust load tests.
+end note
+
+Note --> S3LoaderLocust : Describes
+
+class S3LoaderLocust {
+    - client: S3LoaderClient
+
+    + __init__(*args, **kwargs)
+}
+
+class S3LoaderClient {
+    + execute_upload(f, bucket_name, object_key)
+}
+
+class S3LoaderTaskSet {
+    - event_queue: queue.Queue
+    - uploaded_files: set
+
+    + on_start()
+    + execute_s3_upload()
+}
+
+class CustomCSVStatsWriter {
+    - average_upload_speed_mbps: float
+    + write_stats(file_stream)
+}
+
+class Events {
+    + request_success(request_type, name, response_time, response_length, **kwargs)
+    + request_failure(request_type, name, response_time, exception, **kwargs)
+    + quitting(**kwargs)
+}
+
+class LocalRunner {
+}
+
+S3LoaderLocust --|> S3LoaderTaskSet : contains
+S3LoaderLocust ..> S3LoaderClient : uses
+S3LoaderTaskSet --> queue.Queue : uses
+S3LoaderTaskSet ..> set : uses
+S3LoaderTaskSet --> Events : fires
+Events --> CustomCSVStatsWriter : writes
+S3LoaderLocust --> LocalRunner : is used by
+
+@enduml
