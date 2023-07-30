@@ -102,7 +102,7 @@ total_uploaded_file_size_bits = 0
 
 @events.test_start.add_listener
 def _(environment, **kw):
-    from s3_bucket_ops import Bucket_ops
+    from locust_performance.s3_bucket_ops import Bucket_ops
     bo = Bucket_ops(local_path='/tmp/ZABCDEFGZ', bash_flow=True)
     bo.BUCKET_NAME = 'ai-hayden-event-video-staging'
     # print(bo.role_s3_client)

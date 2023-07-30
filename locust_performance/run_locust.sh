@@ -17,7 +17,7 @@ export LOCUST_LOGLEVEL="DEBUG"
 export LOCUST_HEADLESS="True"
 
 
-#role_s3c=$(python -c "from s3_bucket_ops import Bucket_ops; \
+#role_s3c=$(python -c "from locust_performance.s3_bucket_ops import Bucket_ops; \
 #                        bo = Bucket_ops(local_path='/tmp/ZABCDEFGZ', bash_flow=True); \
 #                        bo.BUCKET_NAME = 'ai-hayden-event-video-staging'; \
 #                       print(bo.role_s3_client); \
@@ -25,8 +25,8 @@ export LOCUST_HEADLESS="True"
 #echo "Value of bo: $role_s3c"
 
 
-get_events_data=$(python -c "import utils; \
-                            from utils import make_get_events_data; \
+get_events_data=$(python -c "import locust_performance.utils; \
+                            from locust_performance.utils import make_get_events_data; \
                             local_get_events_data = make_get_events_data(); \
                             print(local_get_events_data); \
                           ")
