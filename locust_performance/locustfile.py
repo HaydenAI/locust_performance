@@ -36,17 +36,68 @@ def _(parser):
     parser.add_argument("--the_data", type=str, env_var="the_data", default="", help="It's working")
 
 
+class CustomStatsEntry(stats.StatsEntry):
+    def __init__(self, request_type, name):
+        super().__init__(request_type, name)
+        self.total_uploaded_file_size_bits = 0
+        self.total_upload_time = 0
+        self.current_upload_speed_mbps = 0
+
+
+# Define a dictionary to store custom request statistics
+custom_request_stats = {}
+
+
+def update_current_upload_speed_stats(request_type, name, file_size_bits, elapsed_time):
+    # Calculate the current upload speed in Mbps
+    current_upload_speed_mbps = file_size_bits / (elapsed_time * 1_000_000)
+
+    # Get or create the custom stats for the current request
+    request_key = (request_type, name)
+    custom_stats = custom_request_stats.get(request_key)
+    if custom_stats is None:
+        custom_stats = {
+            'request_type': request_type,
+            'name': name,
+            'total_uploaded_file_size_bits': 0,
+            'total_upload_time': 0,
+            'current_upload_speed_mbps': 0,
+            'average_upload_speed_mbps': 0,
+        }
+        custom_request_stats[request_key] = custom_stats
+
+    # Update the CustomStatsEntry object with the current upload speed
+    custom_stats['total_uploaded_file_size_bits'] += file_size_bits
+    custom_stats['total_upload_time'] += elapsed_time
+    custom_stats['current_upload_speed_mbps'] = current_upload_speed_mbps
+
+    # Calculate and update the average upload speed in Mbps
+    if custom_stats['total_upload_time'] > 0:
+        average_upload_speed_mbps = custom_stats['total_uploaded_file_size_bits'] / (custom_stats['total_upload_time'] * 1_000_000)
+        custom_stats['average_upload_speed_mbps'] = average_upload_speed_mbps
+
+    # Print the current upload speed if needed
+    # print(f"-----> Current upload speed (Mbps): {current_upload_speed_mbps:.2f}")
+
+
 class CustomCSVStatsWriter(stats.StatsCSV):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.average_upload_speed_mbps = 0
 
     def write_stats(self, file_stream):
         # Call the base class write_stats method to write the standard statistics
         super().write_stats(file_stream)
 
-        # Write the average upload speed to the CSV file
-        file_stream.write(f'Average Upload Speed (Mbps),{self.average_upload_speed_mbps:.2f}\n')
+        # Write the custom statistics to the CSV file
+        file_stream.write("Request Type,Name,Total Uploaded File Size (bits),Total Upload Time (s),Current Upload Speed (Mbps),Average Upload Speed (Mbps)\n")
+        for key, custom_stats in events.custom_request_stats.items():
+            file_stream.write(
+                f"{custom_stats['request_type']},{custom_stats['name']},{custom_stats['total_uploaded_file_size_bits']},{custom_stats['total_upload_time']},{custom_stats['current_upload_speed_mbps']:.2f},{custom_stats['average_upload_speed_mbps']:.2f}\n"
+            )
+
+
+# Register the CustomCSVStatsWriter to be used as the StatsCSV writer
+stats.CSV_STATS_WRITER = CustomCSVStatsWriter
 
 
 # Add a listener to the request_success event to calculate the average upload speed
@@ -54,9 +105,10 @@ class CustomCSVStatsWriter(stats.StatsCSV):
 def on_request_success(request_type, name, response_time, response_length, **kwargs):
     # Calculate the elapsed_time from the response_time provided by the event
     elapsed_time = response_time / 1000.0  # Convert to seconds
-
     # Calculate the size of the file in bits
+
     local_path = kwargs.get('local_path')
+
     if local_path:
         file_size_bytes = os.path.getsize(local_path)
         file_size_bits = file_size_bytes * 8
@@ -66,7 +118,26 @@ def on_request_success(request_type, name, response_time, response_length, **kwa
         global total_uploaded_file_size_bits
         total_upload_time += elapsed_time
         total_uploaded_file_size_bits += file_size_bits
+        print(f"-----> Current upload file size: {file_size_bits}")
+        # Call the update_current_upload_speed_stats function with the updated stats
+        update_current_upload_speed_stats(request_type, name, file_size_bits, elapsed_time)
 
+
+# @events.request_success.add_listener
+# def on_request_success(request_type, name, response_time, response_length, **kwargs):
+#     # Check if the response was received successfully (status code 2xx)
+#     if 200 <= kwargs['response'].status_code < 300:
+#         import pdb
+#         pdb.set_trace()
+        # Calculate custom_metric1 and custom_metric2 based on the response or any other logic
+        # custom_metric1 = calculate_custom_metric1(kwargs['response'])
+        # custom_metric2 = calculate_custom_metric2(kwargs['response'])
+        #
+        # # Update custom metrics for the request in the StatsEntry object
+        # stats_entry = kwargs['user'].get_current_task().get_stats(request_type, name)
+        # if stats_entry:
+        #     stats_entry.custom_metric1 = custom_metric1
+        #     stats_entry.custom_metric2 = custom_metric2
 
 # Add a listener to the quitting event to write the average upload speed to the statistics file
 @events.quitting.add_listener
@@ -85,19 +156,20 @@ def write_average_upload_speed_to_csv(**kwargs):
         if isinstance(runner, runners.LocalRunner):
             # If using LocalRunner, use the default CSV file path
             stats_file_path = "/tmp/analysis.csv_stats.csv"
+            current_upload_speed_mbps = 0
         else:
             # If using MasterLocustRunner, use the custom stats writer instance
-            custom_stats_writer = runner.stats.get_writer(stats.CSVStats)
+            custom_stats_writer = runner.stats.get_writer(CustomCSVStatsWriter)
+            if hasattr(custom_stats_writer, 'current_upload_speed_mbps'):
+                current_upload_speed_mbps = custom_stats_writer.current_upload_speed_mbps
+            else:
+                current_upload_speed_mbps = 0
+
             stats_file_path = custom_stats_writer.file_stream.name
 
-        # Write the average upload speed to the statistics file
+        # Write the average upload speed and current upload speed to the statistics file
         with open(stats_file_path, 'a') as stats_file:
             stats_file.write(f'Average Upload Speed (Mbps),{average_upload_speed_mbps:.2f}\n')
-
-
-# Global variables to store the total upload time and total uploaded file size in bits
-total_upload_time = 0
-total_uploaded_file_size_bits = 0
 
 
 @events.test_start.add_listener
@@ -201,6 +273,13 @@ class S3LoaderTaskSet(TaskSet):
                 fixed_delay = max(0, target_upload_time - elapsed_time)
                 time.sleep(fixed_delay)
 
+                events.request.fire(
+                    request_type="POST",
+                    name="execute_s3_upload",
+                    response_time=int((time.time() - start_time) * 1000),
+                    response_length=0,
+                    **{'local_path': local_path}  # Include local_path in the kwargs
+                )
         except queue.Empty:
             # If the queue is empty, all events are uploaded
             pass

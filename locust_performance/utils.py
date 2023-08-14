@@ -9,6 +9,38 @@ import datetime
 import time
 
 
+import subprocess
+import json
+
+
+def get_queue_size(queue_url):
+    '''
+    # Replace this with the actual URL of the queue you want to query
+    queue_url = "https://sqs.us-west-2.amazonaws.com/744897374265/light-event-processor-queue-staging"
+
+    queue_size = get_queue_size(queue_url)
+    print("Approximate number of messages in the queue:", queue_size)
+    # get_queue_size('https://sqs.us-west-2.amazonaws.com/744897374265/light-event-processor-queue-staging')
+    # get_queue_size('https://sqs.us-west-2.amazonaws.com/744897374265/s3-media-transform-queue-staging')
+    # get_queue_size('https://sqs.us-west-2.amazonaws.com/744897374265/match-detector-queue-staging')
+    :param queue_url:
+    :return:
+    '''
+
+    command = ["aws", "sqs", "get-queue-attributes", "--queue-url", queue_url, "--attribute-names", "ApproximateNumberOfMessages"]
+    try:
+        result = subprocess.run(command, capture_output=True, text=True)
+        print(f"result.returncode: {result.returncode}")
+        if result.returncode == 0:
+            output = json.loads(result.stdout)
+            mesg_nums = int(output["Attributes"]["ApproximateNumberOfMessages"])
+            print(f"{queue_url}: number of messages: {mesg_nums}")
+        else:
+            print("----> Error:", result.stderr)
+    except Exception as e:
+        print("Error:", e)
+
+
 def s3_bucket_operations():
     from s3_bucket_ops import Bucket_ops
     bo = Bucket_ops(local_path='/tmp/ZABCDEFGZ')
@@ -19,8 +51,6 @@ def get_role_s3_client():
     bucket_op = s3_bucket_operations()
     bucket_op.BUCKET_NAME = "ai-hayden-event-video-staging"
     builtins.role_s3_client = bucket_op.role_s3_client
-    import pdb
-    pdb.set_trace()
 
 
 def make_get_events_data():

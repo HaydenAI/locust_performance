@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# run_performance_tests --num-users 10 --spawn-rate 3 --run-time 10
 # Set up environment variables
 export LOCUST_HOST="http://dummy.host"
 # Get the absolute path of the locustfile.py dynamically
@@ -8,14 +8,15 @@ LOCUST_LOCUSTFILE=$(python -c "import os; \
                                print(os.path.abspath(locustfile.__file__)); \
                              ")
 echo ">>>>>>>>>> Value of LOCUST_LOCUSTFILE: $LOCUST_LOCUSTFILE"
-export LOCUST_NUM_USERS=5
-export LOCUST_SPAWN_RATE=2
-export LOCUST_RUN_TIME=30
+export LOCUST_NUM_USERS=${1:-9}
+export LOCUST_SPAWN_RATE=${2:-2}
+export LOCUST_RUN_TIME=${3:-30}
 export LOCUST_CSV="/tmp/analysis.csv"
 export LOCUST_LOGFILE="/tmp/locust.log"
 export LOCUST_LOGLEVEL="DEBUG"
 export LOCUST_HEADLESS="True"
 
+echo ">>>>>>>>>> Value of LOCUST_RUN_TIME: $LOCUST_RUN_TIME"
 
 #role_s3c=$(python -c "from locust_performance.s3_bucket_ops import Bucket_ops; \
 #                        bo = Bucket_ops(local_path='/tmp/ZABCDEFGZ', bash_flow=True); \

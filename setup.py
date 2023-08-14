@@ -21,7 +21,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'run_performance_tests = locust_performance.driver:run_locust',
+            'run_performance_tests = locust_performance.driver:run_locust_manager',
         ],
     },
 )
