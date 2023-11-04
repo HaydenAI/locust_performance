@@ -139,37 +139,41 @@ def on_request_success(request_type, name, response_time, response_length, **kwa
         #     stats_entry.custom_metric1 = custom_metric1
         #     stats_entry.custom_metric2 = custom_metric2
 
+
 # Add a listener to the quitting event to write the average upload speed to the statistics file
 @events.quitting.add_listener
 def write_average_upload_speed_to_csv(**kwargs):
-    if 'environment' in kwargs:
-        environment = kwargs['environment']
-        if hasattr(environment.runner.stats, 'entries') and total_uploaded_file_size_bits > 0 and total_upload_time > 0:
-            average_upload_speed_mbps = total_uploaded_file_size_bits / (total_upload_time * 1_000_000)
-        else:
-            average_upload_speed_mbps = 0
+    if 'environment' not in kwargs:
+        print("Error: 'environment' not found in kwargs. Unable to write average upload speed to CSV.")
+        return
 
-        # Get the Runner object from the Environment
-        runner = environment.runner
+    environment = kwargs['environment']
 
-        # Check if we are using LocalRunner or MasterLocustRunner
-        if isinstance(runner, runners.LocalRunner):
-            # If using LocalRunner, use the default CSV file path
-            stats_file_path = "/tmp/analysis.csv_stats.csv"
-            current_upload_speed_mbps = 0
-        else:
-            # If using MasterLocustRunner, use the custom stats writer instance
-            custom_stats_writer = runner.stats.get_writer(CustomCSVStatsWriter)
-            if hasattr(custom_stats_writer, 'current_upload_speed_mbps'):
-                current_upload_speed_mbps = custom_stats_writer.current_upload_speed_mbps
-            else:
-                current_upload_speed_mbps = 0
+    if not hasattr(environment, 'runner') or not hasattr(environment.runner, 'stats'):
+        print(
+            "Error: 'environment' or 'environment.runner.stats' not found. Unable to write average upload speed to CSV.")
+        return
 
-            stats_file_path = custom_stats_writer.file_stream.name
+    if total_uploaded_file_size_bits <= 0 or total_upload_time <= 0:
+        print("Warning: No valid data to calculate average upload speed. Writing '0' to CSV.")
+        average_upload_speed_mbps = 0
+    else:
+        average_upload_speed_mbps = total_uploaded_file_size_bits / (total_upload_time * 1_000_000)
 
-        # Write the average upload speed and current upload speed to the statistics file
-        with open(stats_file_path, 'a') as stats_file:
-            stats_file.write(f'Average Upload Speed (Mbps),{average_upload_speed_mbps:.2f}\n')
+    runner = environment.runner
+
+    if isinstance(runner, runners.LocalRunner):
+        stats_file_path = "/tmp/analysis.csv_stats.csv"
+    else:
+        custom_stats_writer = runner.stats.get_writer(stats.CSVStats)
+        if custom_stats_writer is None:
+            print("Error: Custom stats writer not found. Unable to write average upload speed to CSV.")
+            return
+        stats_file_path = custom_stats_writer.file_stream.name
+
+    # Write the average upload speed to the statistics file
+    with open(stats_file_path, 'a') as stats_file:
+        stats_file.write(f'Average Upload Speed (Mbps),{average_upload_speed_mbps:.2f}\n')
 
 
 @events.test_start.add_listener
