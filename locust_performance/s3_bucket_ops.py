@@ -232,7 +232,8 @@ class Bucket_ops:
                 logging.info(f"object_key: {object_key}")
                 logging.info(f"local_path: {local_path}")
 
-                bucket_name = "ai-hayden-event-video-staging"
+                # bucket_name = "ai-hayden-event-video-staging"
+                bucket_name = "ai-hayden-event-video-eupilot"
                 if self.check_object_exists(bucket_name, object_key):
                     logging.info(f"removing object: {object_key}")
                     self.role_s3_client.delete_object(Bucket=bucket_name, Key=object_key)

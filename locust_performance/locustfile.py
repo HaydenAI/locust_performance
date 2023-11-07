@@ -180,7 +180,8 @@ def write_average_upload_speed_to_csv(**kwargs):
 def _(environment, **kw):
     from locust_performance.s3_bucket_ops import Bucket_ops
     bo = Bucket_ops(local_path='/tmp/ZABCDEFGZ', bash_flow=True)
-    bo.BUCKET_NAME = 'ai-hayden-event-video-staging'
+    # bo.BUCKET_NAME = 'ai-hayden-event-video-staging'
+    bo.BUCKET_NAME = 'ai-hayden-event-video-eupilot'
     # print(bo.role_s3_client)
     # print(f"-----> Custom argument supplied: {type(environment.parsed_options.role_s3_client)}")
     # print(f"-----> Custom argument: type of the_data: {type(ast.literal_eval(environment.parsed_options.the_data))}")
@@ -246,7 +247,8 @@ class S3LoaderTaskSet(TaskSet):
             file_id = f"{event_id}-{object_key}"
             if file_id not in self.uploaded_files:
                 with open(local_path, 'rb') as f:
-                    bucket_name = "ai-hayden-event-video-staging"
+                    # bucket_name = "ai-hayden-event-video-staging"
+                    bucket_name = "ai-hayden-event-video-eupilot"
                     start_time = time.time()
                     self.client.execute_upload(f, bucket_name, object_key)
                     end_time = time.time()

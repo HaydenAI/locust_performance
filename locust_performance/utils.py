@@ -49,7 +49,8 @@ def s3_bucket_operations():
 
 def get_role_s3_client():
     bucket_op = s3_bucket_operations()
-    bucket_op.BUCKET_NAME = "ai-hayden-event-video-staging"
+    # bucket_op.BUCKET_NAME = "ai-hayden-event-video-staging"
+    bucket_op.BUCKET_NAME = "ai-hayden-event-video-eupilot"
     builtins.role_s3_client = bucket_op.role_s3_client
 
 
