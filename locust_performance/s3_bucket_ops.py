@@ -39,7 +39,7 @@ class Bucket_ops:
         # self.session = None
         # self.mc = Configuration()
         # self.current_profile = self.mc.parse_cmd_line().__dict__.get('profile')
-        self.current_profile = 'Staging'
+        self.current_profile = 'eu_pilot'
         # cred_obj = self.session.get_credentials()
         # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)
         # s3_client.list_buckets()
@@ -151,7 +151,7 @@ class Bucket_ops:
         # if self.mc.parse_cmd_line().__dict__.get('flow_name') == 'load_test' or self.bash_flow:
         # todo::refactor to separate flow method -------------
         self.parse_aws_config_file('~/.aws/config')
-        self.staging_profile = self.local_config_profiles.get('profile Staging')
+        self.staging_profile = self.local_config_profiles.get('profile eu_pilot')
         self.parse_latest_sso_file('~/.aws/sso/cache')
         self.get_role_credentials_proc()
         # expln::self.role_credentials becomes available now
