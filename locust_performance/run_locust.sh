@@ -11,12 +11,14 @@ echo ">>>>>>>>>> Value of LOCUST_LOCUSTFILE: $LOCUST_LOCUSTFILE"
 export LOCUST_NUM_USERS=${1:-9}
 export LOCUST_SPAWN_RATE=${2:-2}
 export LOCUST_RUN_TIME=${3:-30}
+export TARGET_ENVIRONMENT=${4:-'Staging'}
 export LOCUST_CSV="/tmp/analysis.csv"
 export LOCUST_LOGFILE="/tmp/locust.log"
 export LOCUST_LOGLEVEL="DEBUG"
 export LOCUST_HEADLESS="True"
 
 echo ">>>>>>>>>> Value of LOCUST_RUN_TIME: $LOCUST_RUN_TIME"
+echo ">>>>>>>>>> Value of TARGET_ENVIRONMENT: $TARGET_ENVIRONMENT"
 
 #role_s3c=$(python -c "from locust_performance.s3_bucket_ops import Bucket_ops; \
 #                        bo = Bucket_ops(local_path='/tmp/ZABCDEFGZ', bash_flow=True); \

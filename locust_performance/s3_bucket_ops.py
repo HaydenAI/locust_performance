@@ -9,6 +9,7 @@ import time
 import datetime
 import logging
 import json
+import yaml
 import random
 # import pytest
 from pathlib import Path
@@ -39,7 +40,12 @@ class Bucket_ops:
         # self.session = None
         # self.mc = Configuration()
         # self.current_profile = self.mc.parse_cmd_line().__dict__.get('profile')
+        self.current_profile = os.environ.get('TARGET_ENVIRONMENT')
+        self.config = self.parse_config_yaml('locust_performance/config.yaml')
+        self.target_s3_bucket = self.config.get('data').get('target_s3_buckets').get(self.current_profile)
         self.current_profile = 'eu_pilot'
+        import pdb
+        pdb.set_trace()
         # cred_obj = self.session.get_credentials()
         # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)
         # s3_client.list_buckets()
@@ -86,7 +92,7 @@ class Bucket_ops:
         self.local_path = local_path
         self.file_name = Path(self.local_path).parts[-1]
         # self.BUCKET_NAME = 'ai-hayden-vpn-device-beta'
-        self.BUCKET_NAME = 'ai-hayden-iat-reports-beta'
+        self.BUCKET_NAME = self.target_s3_bucket
         self.s3_dir = None
         self.local_path_list = []
         self.current_path = os.path.dirname(os.path.realpath(__file__))
@@ -218,6 +224,14 @@ class Bucket_ops:
     #             break
     #     assert session_id is not None, 'Failed to find data'
     #     return [x for x in all_the_data if [*x.keys()][0] == session_id][0].get(session_id)
+    def parse_config_yaml(self, file_path):
+        try:
+            with open(file_path, 'r') as file:
+                config_data = yaml.safe_load(file)
+            return config_data
+        except Exception as e:
+            print(f"Error reading or parsing the config file: {e}")
+            return None
 
     def remove_files_from_s3(self):
         # https://docs.aws.amazon.com/AmazonS3/latest/userguide/example_s3_PutObject_section.html
@@ -231,12 +245,12 @@ class Bucket_ops:
                 local_path = self.the_data.get(event_id)[i+1].get('file_path')
                 logging.info(f"object_key: {object_key}")
                 logging.info(f"local_path: {local_path}")
-
+                # expln:: self.target_s3_bucket using instead of bucket_name
                 # bucket_name = "ai-hayden-event-video-staging"
-                bucket_name = "ai-hayden-event-video-eupilot"
-                if self.check_object_exists(bucket_name, object_key):
+                # bucket_name = "ai-hayden-event-video-eupilot"
+                if self.check_object_exists(self.target_s3_bucket, object_key):
                     logging.info(f"removing object: {object_key}")
-                    self.role_s3_client.delete_object(Bucket=bucket_name, Key=object_key)
+                    self.role_s3_client.delete_object(Bucket=self.target_s3_bucket, Key=object_key)
                 else:
                     logging.info(f"object doesn't exists in s3: {object_key}")
 

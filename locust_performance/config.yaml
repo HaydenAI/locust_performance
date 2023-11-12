@@ -1,0 +1,4 @@
+data:
+  target_s3_buckets:
+    Staging: ai-hayden-event-video-staging
+    eu_pilot: ai-hayden-event-video-eupilot

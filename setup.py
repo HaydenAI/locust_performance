@@ -17,7 +17,7 @@ setup(
         # Add any other dependencies here
     ],
     package_data={
-        'locust_performance': ['run_locust.sh'],
+        'locust_performance': ['run_locust.sh', 'config.yaml'],
     },
     entry_points={
         'console_scripts': [
