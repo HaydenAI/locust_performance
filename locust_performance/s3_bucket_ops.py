@@ -565,12 +565,12 @@ class Bucket_ops:
     #     # pytest.global_data['global_data']['device_id'] = device_ids
 
 
-if __name__ == "__main__":
-    bo = Bucket_ops(local_path='/tmp/')
-    bo.remove_files_from_s3()
-    # bo.get_role_credentials_proc()
-    import pdb
-    pdb.set_trace()
+# if __name__ == "__main__":
+#     bo = Bucket_ops(local_path='/tmp/')
+#     bo.remove_files_from_s3()
+#     # bo.get_role_credentials_proc()
+#     import pdb
+#     pdb.set_trace()
 
 
     # aws_data = {'aws_access_key_id': 'xxx',
