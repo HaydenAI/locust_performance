@@ -41,11 +41,10 @@ class Bucket_ops:
         # self.mc = Configuration()
         # self.current_profile = self.mc.parse_cmd_line().__dict__.get('profile')
         self.current_profile = os.environ.get('TARGET_ENVIRONMENT')
-        self.config = self.parse_config_yaml('locust_performance/config.yaml')
+        self.config = self.parse_config_yaml(os.path.join(os.path.dirname(__file__), 'config.yaml'))
+        # self.config = self.parse_config_yaml('locust_performance/config.yaml')
         self.target_s3_bucket = self.config.get('data').get('target_s3_buckets').get(self.current_profile)
         self.current_profile = 'eu_pilot'
-        import pdb
-        pdb.set_trace()
         # cred_obj = self.session.get_credentials()
         # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)
         # s3_client.list_buckets()
