@@ -19,7 +19,7 @@ def init_routine():
     parser.add_argument('--num-users', dest='num_users', type=int, default=9, help="Number of users")
     parser.add_argument('--spawn-rate', dest='spawn_rate', type=int, default=2, help="User spawn rate")
     parser.add_argument('--run-time', dest='run_time', type=int, default=30, help="Test run time")
-    parser.add_argument('--target-environment', dest='target_environment', type=str, default='Staging',
+    parser.add_argument('--target-environment', dest='target_environment', type=str, default='eu_pilot',
                         help="pointing to local aws profile")
     global_args = parser.parse_args()
     builtins.params = {'num_users': global_args.num_users, 'run_time': global_args.run_time,
@@ -46,6 +46,19 @@ def run_locust(**kwargs):
         print(f"Error running 'run_locust.sh': {e}")
     except FileNotFoundError:
         print("'run_locust.sh' file not found.")
+
+
+def get_performance_config():
+    '''
+    function retrieves performance configuration parameters from a specified local path using
+    the Bucket_ops class. It initializes an instance of Bucket_ops with the local path set to
+    '/tmp/' and then retrieves the 'targets' from the 'data' section of the configuration.
+    :return:
+    The function returns the extracted 'targets' configuration, providing access to performance-related
+    settings specified in the configuration file
+    '''
+    bo = Bucket_ops(local_path='/tmp/')
+    return bo.config.get('data').get('targets')
 
 
 def run_locust_manager():

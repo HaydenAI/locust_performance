@@ -1,4 +1,9 @@
 data:
-  target_s3_buckets:
-    Staging: ai-hayden-event-video-staging
-    eu_pilot: ai-hayden-event-video-eupilot
+  targets:
+    Staging:
+      target_s3_bucket: ai-hayden-event-video-staging
+      fleet_id: 85128058-4904-44d5-bb50-47d69d1d4679
+    eu_pilot:
+      target_s3_bucket: ai-hayden-event-video-eupilot
+      fleet_id: c44e4da1-274d-49d4-b818-dd5198fafbc5
+

@@ -41,12 +41,14 @@ class Bucket_ops:
         # self.mc = Configuration()
         # self.current_profile = self.mc.parse_cmd_line().__dict__.get('profile')
         self.current_profile = os.environ.get('TARGET_ENVIRONMENT')
+        # self.current_profile = 'eu_pilot'
+        assert self.current_profile, '*** missing TARGET_ENVIRONMENT environ variable ***'
         self.config = self.parse_config_yaml(os.path.join(os.path.dirname(__file__), 'config.yaml'))
         # self.config = self.parse_config_yaml('locust_performance/config.yaml')
-        self.target_s3_bucket = self.config.get('data').get('target_s3_buckets').get(self.current_profile)
-        self.current_profile = 'eu_pilot'
+        # self.target_s3_bucket = self.config.get('data').get('target_s3_buckets').get(self.current_profile)
+        self.target_s3_bucket = [*self.config.get('data').values()][0].get(self.current_profile).get('target_s3_bucket')
         # cred_obj = self.session.get_credentials()
-        # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)
+        # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)z
         # s3_client.list_buckets()
         # self.session = boto3.Session(profile_name="Staging") - worked
         # s3_client = self.session.client('s3')
@@ -565,12 +567,12 @@ class Bucket_ops:
     #     # pytest.global_data['global_data']['device_id'] = device_ids
 
 
-# if __name__ == "__main__":
-#     bo = Bucket_ops(local_path='/tmp/')
-#     bo.remove_files_from_s3()
-#     # bo.get_role_credentials_proc()
-#     import pdb
-#     pdb.set_trace()
+if __name__ == "__main__":
+    bo = Bucket_ops(local_path='/tmp/')
+    # bo.remove_files_from_s3()
+    # bo.get_role_credentials_proc()
+    import pdb
+    pdb.set_trace()
 
 
     # aws_data = {'aws_access_key_id': 'xxx',
