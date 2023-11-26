@@ -47,8 +47,10 @@ class Bucket_ops:
         # self.config = self.parse_config_yaml('locust_performance/config.yaml')
         # self.target_s3_bucket = self.config.get('data').get('target_s3_buckets').get(self.current_profile)
         self.target_s3_bucket = [*self.config.get('data').values()][0].get(self.current_profile).get('target_s3_bucket')
+        assert self.target_s3_bucket, f'*** self.target_s3_bucket is None, possibly name of the profile name is ' \
+                                      f'wrong in specified environment >>> -e {self.current_profile} <<< ***'
         # cred_obj = self.session.get_credentials()
-        # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)z
+        # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)
         # s3_client.list_buckets()
         # self.session = boto3.Session(profile_name="Staging") - worked
         # s3_client = self.session.client('s3')
