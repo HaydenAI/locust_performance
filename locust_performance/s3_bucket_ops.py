@@ -49,6 +49,8 @@ class Bucket_ops:
         self.target_s3_bucket = [*self.config.get('data').values()][0].get(self.current_profile).get('target_s3_bucket')
         assert self.target_s3_bucket, f'*** self.target_s3_bucket is None, possibly name of the profile name is ' \
                                       f'wrong in specified environment >>> -e {self.current_profile} <<< ***'
+        self.REGION = os.environ.get('REGION')
+        assert self.REGION, '*** missing REGION environ variable ***'
         # cred_obj = self.session.get_credentials()
         # s3_client = boto3.client('s3', region_name="us-west-2", session_token=self.session)
         # s3_client.list_buckets()
@@ -81,7 +83,7 @@ class Bucket_ops:
         # session = boto3.Session()
         # active_profile = session.profile_name
         # print("Active Profile:", active_profile)
-        self.REGION = 'us-west-2'
+        ### self.REGION = 'us-west-2'
         # if aws_access_key_id is None:
         #     self.AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
         # else:
