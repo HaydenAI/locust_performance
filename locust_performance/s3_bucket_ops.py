@@ -170,6 +170,7 @@ class Bucket_ops:
         self.role_session = boto3.Session(
             # aws_access_key_id=self.role_credentials.get('accessKeyId'),
             # aws_secret_access_key=self.role_credentials.get('secretAccessKey'),
+            profile_name='Staging',
             aws_session_token=self.role_credentials.get('sessionToken'),
             region_name=self.staging_profile.get('region')
         )
