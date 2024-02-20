@@ -65,20 +65,20 @@ class Bucket_ops:
             self.s3_resource = self.session.resource('s3', region_name='us-west-2')
             self.AWS_ACCESS_KEY_ID = None
             self.AWS_SECRET_ACCESS_KEY = None
-        else:
-            if aws_access_key_id is None:
-                self.AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-            else:
-                self.AWS_ACCESS_KEY_ID = aws_access_key_id
-            if aws_secret_access_key_id is None:
-                self.AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-            else:
-                self.AWS_SECRET_ACCESS_KEY = aws_secret_access_key_id
-            self.s3_resource = boto3.resource('s3', region_name='us-west-2', aws_access_key_id=self.AWS_ACCESS_KEY_ID,
-                                              aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY)
-            self.session = boto3.Session(
-                aws_access_key_id=self.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY)
+        # else:
+        #     if aws_access_key_id is None:
+        #         self.AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+        #     else:
+        #         self.AWS_ACCESS_KEY_ID = aws_access_key_id
+        #     if aws_secret_access_key_id is None:
+        #         self.AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+        #     else:
+        #         self.AWS_SECRET_ACCESS_KEY = aws_secret_access_key_id
+        #     self.s3_resource = boto3.resource('s3', region_name='us-west-2', aws_access_key_id=self.AWS_ACCESS_KEY_ID,
+        #                                       aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY)
+        #     self.session = boto3.Session(
+        #         aws_access_key_id=self.AWS_ACCESS_KEY_ID,
+        #         aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY)
         self.parsed_sso_data = None
         # session = boto3.Session()
         # active_profile = session.profile_name
@@ -168,8 +168,8 @@ class Bucket_ops:
         # expln::self.role_credentials becomes available now
         # Create a new session using the role credentials
         self.role_session = boto3.Session(
-            aws_access_key_id=self.role_credentials.get('accessKeyId'),
-            aws_secret_access_key=self.role_credentials.get('secretAccessKey'),
+            # aws_access_key_id=self.role_credentials.get('accessKeyId'),
+            # aws_secret_access_key=self.role_credentials.get('secretAccessKey'),
             aws_session_token=self.role_credentials.get('sessionToken'),
             region_name=self.staging_profile.get('region')
         )
