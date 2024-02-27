@@ -168,10 +168,7 @@ class Bucket_ops:
         # expln::self.role_credentials becomes available now
         # Create a new session using the role credentials
         self.role_session = boto3.Session(
-            # aws_access_key_id=self.role_credentials.get('accessKeyId'),
-            # aws_secret_access_key=self.role_credentials.get('secretAccessKey'),
             profile_name='Staging',
-            aws_session_token=self.role_credentials.get('sessionToken'),
             region_name=self.staging_profile.get('region')
         )
 
@@ -573,6 +570,7 @@ class Bucket_ops:
 
 
 if __name__ == "__main__":
+    # os.environ['TARGET_ENVIRONMENT'] = 'Staging'
     bo = Bucket_ops(local_path='/tmp/')
     # bo.remove_files_from_s3()
     # bo.get_role_credentials_proc()
