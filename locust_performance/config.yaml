@@ -2,7 +2,8 @@ data:
   targets:
     Staging:
       target_s3_bucket: ai-hayden-event-video-staging
-      fleet_id: 85128058-4904-44d5-bb50-47d69d1d4679
+      #fleet_id: 85128058-4904-44d5-bb50-47d69d1d4679
+      fleet_id: 872a8e92-54b5-47b3-90a3-1210ab274d97
       region: 'us-west-2'
     eu_pilot:
       target_s3_bucket: ai-hayden-event-video-eupilot
